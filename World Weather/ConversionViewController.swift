@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 class ConversionViewController: UIViewController {
     
@@ -14,14 +15,37 @@ class ConversionViewController: UIViewController {
     @IBOutlet weak var textField: UITextField!
     
     @IBAction func farhenheitFieldEditingChanged (_ textField: UITextField) {
-        guard let text = textField.text, !text.isEmpty else {
-            celsiousLabel.text = "???"
+        guard let text = textField.text, let value = Double(text) else {
+            farenheitValue = nil
             return
         }
-        celsiousLabel.text = text
+        farenheitValue = Measurement(value: value, unit: .fahrenheit)
     }
     
     @IBAction func dismissKeyboard (_ sender: UITapGestureRecognizer) {
-        textField.resignFirstResponder()
+            textField.resignFirstResponder()
+    }
+    
+    
+    
+    var farenheitValue: Measurement<UnitTemperature>? {
+        didSet {
+            updateCelciusLabel()
+        }
+    }
+    
+    var celciusValue: Measurement<UnitTemperature>? {
+        guard let farenheitValue = farenheitValue else {
+            return nil
+        }
+        return farenheitValue.converted(to: .celsius)
+    }
+    
+    func updateCelciusLabel() {
+        guard let celsiusValue = celciusValue else {
+            celsiousLabel.text = "???"
+            return
+        }
+        celsiousLabel.text = "\(celsiusValue.value)"
     }
 }
